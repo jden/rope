@@ -55,17 +55,21 @@ a [mocha](https://npm.im/mocha)-style test given:
 
 ## usage
 
-### `rope() => MinqTestBuilder`
+### `rope() => MinqFakeBuilder`
 
 Constructor function. Returns a new MinqTestBuilder object.
 
-### `MinqTestBuilder#stub(config) => MinqTestBuilder`
+### `MinqFakeBuilder#stub(config) => MinqFakeBuilder`
 
 Chainable. Set up return values for queries. `config` is an object with these properties:
 
   - `data`: (required) The return value. Depending on the expected cardinality of the query (eg, `minq#one` vs `minq#toArray`), this should be an Array or a scalar Object.
   - `collection`: The expected collection of the query.
   - `where`: The expected conditional clause of the query.
+
+### `MinqFakeBuilder#minq() => MinqFake`
+
+Returns an object with the same interface as `minq`. Use this object in place of requiring `minq` in your functions under test.
 
 ## Stub dispatch
 
