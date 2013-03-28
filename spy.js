@@ -38,11 +38,18 @@ Spy.prototype = {
     return this
   },
   select: setter('options.select'),
-  expect: setter('options.expect'),
+  expect: function (val) {
+    if (typeof val !== 'number') {
+      val = 1
+    }
+    this.set('options.expect', val)
+    return this
+  },
   sort: setter('options.sort'),
   skip: setter('options.skip'),
   limit: setter('options.limit'),
   toArray: finalizer('read', function () {
+    this.__active.type = 'toArray'
     return this.dispatch()
   }),
   one: finalizer('read', function () {
@@ -53,20 +60,27 @@ Spy.prototype = {
 
   }),
   insert: finalizer('write', function (changes) {
+    this.__active.type = 'insert'
+    this.set('changes', changes)
+  }),
+  upsert: finalizer('write', function (changes) {
+    this.__active.type = 'upsert'
     this.set('changes', changes)
   }),
   set: function (prop, val) {
-    var prop = prop.split('.').reduce(function (up, prop) {
+    prop = prop.split('.')
+    var end = prop.pop()
+    if (!prop.length) {
+      this.__active[end] = val
+      return this
+    }
+
+    var prop = prop.reduce(function (up, prop) {
       up[prop] = up[prop] || {}
       return up[prop]
     }, this.__active)
-    if (typeof val === 'object') {
-      for(var p in val) {
-        prop[p] = val[p]
-      }
-    } else {
-      prop = val
-    }
+
+    prop[end] = val
     return this
   }
 }

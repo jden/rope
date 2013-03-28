@@ -97,12 +97,41 @@ describe('minq syntax', function () {
     }).then(done, done)
   })
 
+  it('one', function (done) {
+
+    var spy = rope().minq()
+
+    spy.collection('foo')
+    .one()
+    .then(function () {
+      spy.queries[0].type.should.equal('one')
+      spy.queries.length.should.equal(1)
+      spy.readQueries.length.should.equal(1)
+    }).then(done, done)
+
+  })
+
+  it('toArray', function (done) {
+
+    var spy = rope().minq()
+
+    spy.collection('foo')
+    .toArray()
+    .then(function () {
+      spy.queries[0].type.should.equal('toArray')
+      spy.queries.length.should.equal(1)
+      spy.readQueries.length.should.equal(1)
+    }).then(done, done)
+
+  })
+
   it('insert', function (done) {
     var spy = rope().minq()
 
     spy.collection('foo')
     .insert({blah: 2})
     .then(function () {
+      spy.queries[0].type.should.equal('insert')
       spy.queries.length.should.equal(1)
       spy.writeQueries.length.should.equal(1)
       spy.queries[0].changes.should.deep.equal({blah: 2})
@@ -111,6 +140,22 @@ describe('minq syntax', function () {
     }).then(done, done)
 
   })
+
+  it('upsert', function (done) {
+    var spy = rope().minq()
+
+    spy.collection('bar')
+    .upsert({_id: 12, name: 'baz'})
+    .then(function () {
+      spy.queries[0].type.should.equal('upsert')
+      spy.queries.length.should.equal(1)
+      spy.writeQueries.length.should.equal(1)
+      spy.queries[0].changes.should.deep.equal({_id: 12, name: 'baz'})
+      spy.writeQueries[0].changes.should.deep.equal({_id: 12, name: 'baz'})
+
+    }).then(done, done)
+  })
+
 })
 
 describe('query recording', function () {
@@ -203,7 +248,20 @@ describe('query recording', function () {
       .expect(1)
       .one()
       .then(function () {
-        spy.queries[0].options.expect.should.deep.equal(1)
+        spy.queries[0].options.expect.should.equal(1)
+      })
+      .then(done, done)
+  })
+  it('expect default', function (done) {
+    var spy = rope()
+      .stub({data: {_id: 'foo' }})
+      .minq()
+
+    spy.from('blah')
+      .expect()
+      .one()
+      .then(function () {
+        spy.queries[0].options.expect.should.equal(1)
       })
       .then(done, done)
   })
