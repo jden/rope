@@ -1,16 +1,27 @@
 var Q = require('q')
 var _ = require('lodash')
+var FunctionCreate = require('functioncreate')
 
-function Spy(config) {
+
+Spy = FunctionCreate(function Spy(config) {
   this.__ = config
   this.queries = []
   this.readQueries = []
   this.writeQueries = []
-}
+
+  return function (db) {
+    if (db) {
+      this.db = db
+    }
+    return this
+  }
+})
+
 
 Spy.prototype = {
   from: function (collection) {
-    this.__active = {collection: collection}
+    this.__active = Query.call(this)
+    this.__active.collection = collection
     return this
   },
   select: function () { return this },
@@ -19,13 +30,14 @@ Spy.prototype = {
     return this
   },
   byId: function (id) {
-    this.set('options.query', {_id: id})
+    this.set('query', {_id: id})
     return this
   },
   byIds: function (ids) {
-    this.set('options.query', {_id: {$in: ids}})
+    this.set('query', {_id: {$in: ids}})
     return this
   },
+  select: setter('options.select'),
   expect: setter('options.expect'),
   sort: setter('options.sort'),
   skip: setter('options.skip'),
@@ -39,6 +51,9 @@ Spy.prototype = {
   }),
   remove: finalizer('write', function () {
 
+  }),
+  insert: finalizer('write', function (changes) {
+    this.set('changes', changes)
   }),
   set: function (prop, val) {
     var prop = prop.split('.').reduce(function (up, prop) {
@@ -56,6 +71,9 @@ Spy.prototype = {
   }
 }
 
+Spy.prototype.collection = function () {
+  return Spy.prototype.from.apply(this, arguments)
+}
 function setter(option) {
   return function (val) {
     this.set(option, val)
@@ -64,10 +82,10 @@ function setter(option) {
 }
 
 function finalizer(type, next) {
-  return function () {
+  return function (val) {
     this.queries.push(this.__active)
-    this[type + 'Queries'].push(this)
-    return Q.resolve(next.call(this))
+    this[type + 'Queries'].push(this.__active)
+    return Q.resolve(next.call(this, val))
   }
 }
 
@@ -78,10 +96,19 @@ Spy.prototype.dispatch = function () {
     return stub.collection == active.collection
   })
 
+  stub = stub || _.find(this.__.stubs, function (stub) {
+    return !stub.collection
+  })
+
   if (stub) {
     return stub.data
   }
+
   //console.log('no collection')
+}
+
+function Query() {
+  return {db: this.db}
 }
 
 module.exports = Spy

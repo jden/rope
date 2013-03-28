@@ -1,4 +1,5 @@
 var Spy = require('./spy')
+var ObjectId = require('objectid')
 
 function rope() {
   if (!(this instanceof rope)) {
@@ -13,11 +14,15 @@ rope.prototype.stub = function (config) {
 }
 
 rope.prototype.minq = function () {
-  return new Spy(this)
+  return Spy(this)
 }
 
 
-
+var oids = {}
+rope.$oid = function (key) {
+  oids[key] = oids[key] || ObjectId()
+  return oids[key]
+}
 
 
 function Stub(config) {
