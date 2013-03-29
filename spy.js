@@ -63,9 +63,23 @@ Spy.prototype = {
     this.__active.type = 'insert'
     this.set('changes', changes)
   }),
+  update: finalizer('write', function (changes) {
+    this.__active.type = 'update'
+    this.set('changes', changes)
+  }),
   upsert: finalizer('write', function (changes) {
     this.__active.type = 'upsert'
     this.set('changes', changes)
+  }),
+  findAndModify: finalizer('write', function (changes) {
+    this.__active.type = 'findAndModify'
+    this.set('changes', changes)
+    return this.dispatch()
+  }),
+  modifyAndFind: finalizer('write', function (changes) {
+    this.__active.type = 'modifyAndFind'
+    this.set('changes', changes)
+    return this.dispatch()
   }),
   set: function (prop, val) {
     prop = prop.split('.')

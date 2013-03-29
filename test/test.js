@@ -141,6 +141,22 @@ describe('minq syntax', function () {
 
   })
 
+  it('update', function (done) {
+    var spy = rope().minq()
+
+    spy.collection('bar')
+    .byId('boop')
+    .update({$set: {name: 'baz'}})
+    .then(function () {
+      spy.queries[0].type.should.equal('update')
+      spy.queries.length.should.equal(1)
+      spy.writeQueries.length.should.equal(1)
+      spy.queries[0].changes.should.deep.equal({$set: {name: 'baz'}})
+      spy.writeQueries[0].should.equal(spy.queries[0])
+
+    }).then(done, done)
+  })
+
   it('upsert', function (done) {
     var spy = rope().minq()
 
@@ -152,6 +168,38 @@ describe('minq syntax', function () {
       spy.writeQueries.length.should.equal(1)
       spy.queries[0].changes.should.deep.equal({_id: 12, name: 'baz'})
       spy.writeQueries[0].changes.should.deep.equal({_id: 12, name: 'baz'})
+
+    }).then(done, done)
+  })
+
+  it('findAndModify', function (done) {
+    var spy = rope().minq()
+
+    spy.collection('bar')
+    .where({foo: 'baz'})
+    .findAndModify({$set: {foo: 'qux'}})
+    .then(function () {
+      spy.queries[0].type.should.equal('findAndModify')
+      spy.queries.length.should.equal(1)
+      spy.writeQueries.length.should.equal(1)
+      spy.queries[0].changes.should.deep.equal({$set: {foo: 'qux'}})
+      spy.writeQueries[0].should.equal(spy.queries[0])
+
+    }).then(done, done)
+  })
+
+  it('modifyAndFind', function (done) {
+    var spy = rope().minq()
+
+    spy.collection('bar')
+    .where({foo: 'baz'})
+    .modifyAndFind({$set: {foo: 'qux'}})
+    .then(function () {
+      spy.queries[0].type.should.equal('modifyAndFind')
+      spy.queries.length.should.equal(1)
+      spy.writeQueries.length.should.equal(1)
+      spy.queries[0].changes.should.deep.equal({$set: {foo: 'qux'}})
+      spy.writeQueries[0].should.equal(spy.queries[0])
 
     }).then(done, done)
   })
