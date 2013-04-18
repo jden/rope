@@ -111,6 +111,24 @@ describe('minq syntax', function () {
 
   })
 
+  it('deferOne', function (done) {
+
+    var spy = rope().minq()
+
+    var one = spy.collection('foo')
+    .deferOne()
+
+    one.should.be.a('function')
+
+    one().then(function () {
+      spy.queries[0].type.should.equal('one')
+      spy.queries.length.should.equal(1)
+      spy.readQueries.length.should.equal(1)
+    }).then(done, done)
+
+  })
+
+
   it('toArray', function (done) {
 
     var spy = rope().minq()
@@ -118,6 +136,23 @@ describe('minq syntax', function () {
     spy.collection('foo')
     .toArray()
     .then(function () {
+      spy.queries[0].type.should.equal('toArray')
+      spy.queries.length.should.equal(1)
+      spy.readQueries.length.should.equal(1)
+    }).then(done, done)
+
+  })
+
+  it('deferToArray', function (done) {
+
+    var spy = rope().minq()
+
+    var array = spy.collection('foo')
+    .deferToArray()
+
+    array.should.be.a('function')
+
+    array().then(function () {
       spy.queries[0].type.should.equal('toArray')
       spy.queries.length.should.equal(1)
       spy.readQueries.length.should.equal(1)

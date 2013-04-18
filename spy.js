@@ -26,7 +26,7 @@ Spy.prototype = {
   },
   select: function () { return this },
   where: function (query) {
-    this.__active.query = query
+    this.__active.query = _.extend(this.__active.query || {}, query)
     return this
   },
   byId: function (id) {
@@ -52,10 +52,16 @@ Spy.prototype = {
     this.__active.type = 'toArray'
     return this.dispatch()
   }),
+  deferToArray: function () {
+    return this.toArray.bind(this)
+  },
   one: finalizer('read', function () {
     this.__active.type = 'one'
     return this.dispatch()
   }),
+  deferOne: function () {
+    return this.one.bind(this)
+  },
   remove: finalizer('write', function () {
 
   }),
