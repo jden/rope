@@ -70,6 +70,39 @@ describe('multiple queries', function () {
     }).then(done, done)
   })
 
+  it('dispatches based on where', function (done) {
+
+    var spy = rope()
+    .stub({
+      data: {
+        _id: '123asd',
+        val: 'foo'
+      }
+    })
+    .stub({
+      data: {
+        _id: '234ewq',
+        val: 'baz'
+      }
+    }).minq()
+
+    function method () {
+      return spy.from('foo').byId('123asd').one().then(function (match) {
+        match.val.should.equal('foo')
+        return spy.from('foo').byId('234ewq').one().then(function (match) {
+          match.val.should.equal('baz')
+        })
+      })
+    }
+
+    method().then(function (){
+      spy.queries.length.should.equal(2)
+      spy.readQueries.length.should.equal(2)
+      spy.writeQueries.length.should.equal(0)
+    }).then(done, done)
+
+  })
+
   it('dispatches data if no collection is specified', function (done) {
     var spy = rope().stub({data: {foo: 'baz'}}).minq()
     spy.from('foos').one().then(function (foo) {

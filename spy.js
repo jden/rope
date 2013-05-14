@@ -124,15 +124,26 @@ function finalizer(type, next) {
 }
 
 Spy.prototype.dispatch = function () {
+  if (this.__.stubs.length === 1) {
+    return this.__.stubs[0].data
+  }
   var active = this.__active
 
-  var stub = _.find(this.__.stubs, function (stub) {
-    return stub.collection == active.collection
+  var stubs = _.filter(this.__.stubs, function (stub) {
+    return stub.collection == active.collection || !stub.collection
   })
+  var stub;
+  if (this.__active.query) {
+    var query = this.__active.query
+    stub = stubs.filter(function (stub) {
+      return Object.keys(query).every(function (key) {
+        return query[key] === stub.data[key]
+      })
+    })[0]
+  } else {
+    stub = stubs[0]
+  }
 
-  stub = stub || _.find(this.__.stubs, function (stub) {
-    return !stub.collection
-  })
 
   if (stub) {
     return stub.data
