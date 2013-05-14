@@ -133,7 +133,7 @@ Spy.prototype.dispatch = function () {
     return stub.collection == active.collection || !stub.collection
   })
   var stub;
-  if (this.__active.query) {
+  if (stubs.length > 1 && this.__active.query) {
     var query = this.__active.query
     stub = stubs.filter(function (stub) {
       return Object.keys(query).every(function (key) {

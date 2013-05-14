@@ -1,6 +1,6 @@
 {
   "name": "rope",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "test harness for minq queries",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "q": "~0.9.2",
     "lodash": "~1.1.0",
-    "objectid": "~2.3.0",
+    "objectid": "~3.0.1",
     "functioncreate": "~0.1.0"
   },
   "devDependencies": {
