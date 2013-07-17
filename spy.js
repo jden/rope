@@ -55,6 +55,10 @@ Spy.prototype = {
   deferToArray: function () {
     return this.toArray.bind(this)
   },
+  count: finalizer('read', function () {
+    this.__active.type = 'count'
+    return this.dispatch()
+  }),
   one: finalizer('read', function () {
     this.__active.type = 'one'
     return this.dispatch()

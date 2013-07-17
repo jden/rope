@@ -144,6 +144,21 @@ describe('minq syntax', function () {
 
   })
 
+  it('count', function (done) {
+
+    var spy = rope().stub({data: 20}).minq()
+
+    spy.collection('foo')
+    .count()
+    .then(function (val) {
+      val.should.equal(20)
+      spy.queries[0].type.should.equal('count')
+      spy.queries.length.should.equal(1)
+      spy.readQueries.length.should.equal(1)
+    }).then(done, done)
+
+  })
+
   it('deferOne', function (done) {
 
     var spy = rope().minq()
