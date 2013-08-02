@@ -1,7 +1,7 @@
 var Q = require('q')
 var _ = require('lodash')
 var FunctionCreate = require('functioncreate')
-
+var deepClone = require('clone')
 
 Spy = FunctionCreate(function Spy(config) {
   this.__ = config
@@ -22,6 +22,13 @@ Spy.prototype = {
   from: function (collection) {
     this.__active = Query.call(this)
     this.__active.collection = collection
+    return this
+  },
+  clone: function () {
+    // to get this to work properly will require
+    // refactoring Query to be te primary object
+    // that occurs somehow in the context of a Spy,
+    // like XMLElements in the context of an owner XMLDocument
     return this
   },
   select: function () { return this },

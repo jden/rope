@@ -1,6 +1,7 @@
 var chai = require('chai')
 chai.should()
 var ObjectId = require('objectid')
+var Q = require('q')
 
 var rope = require('../index')
 
@@ -128,6 +129,22 @@ describe('minq syntax', function () {
     .then(function (aFoo) {
       spy.queries[0].collection.should.equal('foo')
     }).then(done, done)
+  })
+
+  it('clone', function (done) {
+    var spy = rope().minq()
+    var query = spy.from('blah').byId('foo')
+    var query2 = query.clone().where({age: {$gt: 5}}).one()
+    query = query.one()
+
+    Q.all([query, query2]).then(function () {
+      spy.queries.length.should.equal(2)
+      spy.queries[0].query.should.not.have.property('age')
+      spy.queries[1].query.should.have.property('age')
+      console.log(spy.queries)
+    })
+    .then(done, done)
+
   })
 
   it('one', function (done) {
