@@ -25,6 +25,28 @@ rope.$oid = function (key) {
 }
 
 
+// (Dictionary<collectionName: String, documents: Array<Object>) => DbService
+rope.fakeDb = function (collections) {
+  var minq = rope()
+
+  // stub data
+  Object.keys(collections).forEach(function (name) {
+    collections[name].forEach(function (doc) {
+      minq.stub({collection: name, data: doc})
+    })
+  })
+  var db = minq = minq.minq()
+
+  // add props to db
+  Object.keys(collections).forEach(function (name) {
+    Object.defineProperty(db, name, {
+          enumerable: true,
+          get: function () { return minq.from(name) }
+        })
+  })
+  return db
+}
+
 function Stub(config) {
   this.collection = config.collection
   this.data = config.data
