@@ -1,4 +1,4 @@
-var Q = require('q')
+var Promise = require('bluebird')
 var _ = require('lodash')
 var FunctionCreate = require('functioncreate')
 
@@ -118,7 +118,7 @@ function finalizer(type, next) {
   return function (val) {
     this.queries.push(this.__active)
     this[type + 'Queries'].push(this.__active)
-    return Q.resolve(next.call(this, val))
+    return Promise.resolve(next.call(this, val))
   }
 }
 
