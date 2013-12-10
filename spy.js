@@ -38,13 +38,6 @@ Spy.prototype = {
     return this
   },
   select: setter('options.select'),
-  expect: function (val) {
-    if (typeof val !== 'number') {
-      val = 1
-    }
-    this.set('options.expect', val)
-    return this
-  },
   sort: setter('options.sort'),
   skip: setter('options.skip'),
   limit: setter('options.limit'),
@@ -52,20 +45,22 @@ Spy.prototype = {
     this.__active.type = 'toArray'
     return this.dispatch()
   }),
-  deferToArray: function () {
-    return this.toArray.bind(this)
-  },
+  then: finalizer('read', function () {
+    this.__active.type = 'array'
+    return this.dispatch()
+  }),
   count: finalizer('read', function () {
     this.__active.type = 'count'
     return this.dispatch()
   }),
-  one: finalizer('read', function () {
-    this.__active.type = 'one'
+  first: finalizer('read', function () {
+    this.__active.type = 'first'
     return this.dispatch()
   }),
-  deferOne: function () {
-    return this.one.bind(this)
-  },
+  firstOrDefault: finalizer('read', function () {
+    this.__active.type = 'firstOrDefault'
+    return this.dispatch()
+  }),
   remove: finalizer('write', function () {
 
   }),

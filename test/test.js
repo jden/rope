@@ -56,9 +56,9 @@ describe('multiple queries', function () {
     }).minq()
 
     function method() {
-      return spy.from('foo').one().then(function (aFoo) {
+      return spy.from('foo').first().then(function (aFoo) {
         aFoo._id.should.equal('123asd')
-        return spy.from('bar').one()
+        return spy.from('bar').first()
       })
     }
 
@@ -87,9 +87,9 @@ describe('multiple queries', function () {
     }).minq()
 
     function method () {
-      return spy.from('foo').byId('123asd').one().then(function (match) {
+      return spy.from('foo').byId('123asd').first().then(function (match) {
         match.val.should.equal('foo')
-        return spy.from('foo').byId('234ewq').one().then(function (match) {
+        return spy.from('foo').byId('234ewq').first().then(function (match) {
           match.val.should.equal('baz')
         })
       })
@@ -105,7 +105,7 @@ describe('multiple queries', function () {
 
   it('dispatches data if no collection is specified', function (done) {
     var spy = rope().stub({data: {foo: 'baz'}}).minq()
-    spy.from('foos').one().then(function (foo) {
+    spy.from('foos').first().then(function (foo) {
       foo.should.deep.equal({foo: 'baz'})
     }).then(done, done)
   })
@@ -115,7 +115,7 @@ describe('minq syntax', function () {
   it('db constructor', function (done) {
     var spy = rope().minq()
     var db = {}
-    spy(db).from('blah').one().then(function () {
+    spy(db).from('blah').first().then(function () {
       spy.queries[0].db.should.equal(db)
     }).then(done, done)
   })
@@ -124,20 +124,20 @@ describe('minq syntax', function () {
 
     spy
     .from('foo')
-    .one()
+    .first()
     .then(function (aFoo) {
       spy.queries[0].collection.should.equal('foo')
     }).then(done, done)
   })
 
-  it('one', function (done) {
+  it('first', function (done) {
 
     var spy = rope().minq()
 
     spy.collection('foo')
-    .one()
+    .first()
     .then(function () {
-      spy.queries[0].type.should.equal('one')
+      spy.queries[0].type.should.equal('first')
       spy.queries.length.should.equal(1)
       spy.readQueries.length.should.equal(1)
     }).then(done, done)
@@ -159,23 +159,6 @@ describe('minq syntax', function () {
 
   })
 
-  it('deferOne', function (done) {
-
-    var spy = rope().minq()
-
-    var one = spy.collection('foo')
-    .deferOne()
-
-    one.should.be.a('function')
-
-    one().then(function () {
-      spy.queries[0].type.should.equal('one')
-      spy.queries.length.should.equal(1)
-      spy.readQueries.length.should.equal(1)
-    }).then(done, done)
-
-  })
-
 
   it('toArray', function (done) {
 
@@ -184,23 +167,6 @@ describe('minq syntax', function () {
     spy.collection('foo')
     .toArray()
     .then(function () {
-      spy.queries[0].type.should.equal('toArray')
-      spy.queries.length.should.equal(1)
-      spy.readQueries.length.should.equal(1)
-    }).then(done, done)
-
-  })
-
-  it('deferToArray', function (done) {
-
-    var spy = rope().minq()
-
-    var array = spy.collection('foo')
-    .deferToArray()
-
-    array.should.be.a('function')
-
-    array().then(function () {
       spy.queries[0].type.should.equal('toArray')
       spy.queries.length.should.equal(1)
       spy.readQueries.length.should.equal(1)
@@ -299,8 +265,8 @@ describe('query recording', function () {
       })
       .minq()
 
-    spy.from('boo').where({_id: 5, name: 'bob'}).one().then(function () {
-      spy.queries[0].type.should.equal('one')
+    spy.from('boo').where({_id: 5, name: 'bob'}).first().then(function () {
+      spy.queries[0].type.should.equal('first')
       spy.queries[0].query.should.deep.equal({_id: 5, name: 'bob'})
     }).then(done, done)
   })
@@ -312,7 +278,7 @@ describe('query recording', function () {
 
     spy.from('blah')
       .sort({_id: 1})
-      .one()
+      .first()
       .then(function () {
         spy.queries[0].options.sort.should.deep.equal({_id: 1})
       })
@@ -325,7 +291,7 @@ describe('query recording', function () {
 
     spy.from('blah')
       .skip(1)
-      .one()
+      .first()
       .then(function () {
         spy.queries[0].options.skip.should.deep.equal(1)
       })
@@ -338,7 +304,7 @@ describe('query recording', function () {
 
     spy.from('blah')
       .limit(1)
-      .one()
+      .first()
       .then(function () {
         spy.queries[0].options.limit.should.deep.equal(1)
       })
@@ -351,7 +317,7 @@ describe('query recording', function () {
 
     spy.from('blah')
       .byId(1)
-      .one()
+      .first()
       .then(function () {
         spy.queries[0].query.should.deep.equal({_id: 1})
       })
@@ -364,35 +330,9 @@ describe('query recording', function () {
 
     spy.from('blah')
       .byIds([1,2])
-      .one()
+      .first()
       .then(function () {
         spy.queries[0].query.should.deep.equal({_id: {$in: [1,2]}})
-      })
-      .then(done, done)
-  })
-  it('expect', function (done) {
-    var spy = rope()
-      .stub({data: {_id: 'foo' }})
-      .minq()
-
-    spy.from('blah')
-      .expect(1)
-      .one()
-      .then(function () {
-        spy.queries[0].options.expect.should.equal(1)
-      })
-      .then(done, done)
-  })
-  it('expect default', function (done) {
-    var spy = rope()
-      .stub({data: {_id: 'foo' }})
-      .minq()
-
-    spy.from('blah')
-      .expect()
-      .one()
-      .then(function () {
-        spy.queries[0].options.expect.should.equal(1)
       })
       .then(done, done)
   })
@@ -403,7 +343,7 @@ describe('query recording', function () {
 
     spy.from('blah')
       .select({all: 1})
-      .one()
+      .first()
       .then(function () {
         spy.queries[0].options.select.should.deep.equal({all: 1})
       })

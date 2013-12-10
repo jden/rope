@@ -1,6 +1,8 @@
 # rope
 test harness for [minq](https://npm.im/minq) queries
 
+1.0.x of `rope` targets 1.0.x of `minq`
+
 test all the things!
 
 According to [The complete mink harness video](http://www.youtube.com/watch?v=eidzxk8HaxY), the best kind of rope to use is nylon.

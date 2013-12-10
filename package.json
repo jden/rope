@@ -1,6 +1,6 @@
 {
   "name": "rope",
-  "version": "0.5.1",
+  "version": "1.0.0-pre",
   "description": "test harness for minq queries",
   "main": "index.js",
   "scripts": {
